@@ -133,7 +133,7 @@ const InvestmentProfilePage = () => {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="w-full"
+        className="w-full mt-8" // Added mt-8 here to create space above the chart
       >
         <div className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
           <div className="p-4">
@@ -190,37 +190,36 @@ const InvestmentProfilePage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
-          {fakeData.map((option) => (
-            <motion.div
-              key={option.id}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="w-full"
-            >
-              <InvestmentCard
-                key={option.id}
-                option={option}
-                isSelected={selectedOption === option.id}
-                onSelect={setSelectedOption}
-                onInvest={(option) => alert(`Invest in ${option.name}`)}
-              />
-            </motion.div>
-          ))}
+          {fakeData.map((option) => {
+            const isOptionSelected = selectedOption === option.id;
+            return (
+              <React.Fragment key={option.id}>
+                <motion.div
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="w-full"
+                >
+                  <InvestmentCard
+                    key={option.id}
+                    option={option}
+                    isSelected={isOptionSelected}
+                    onSelect={setSelectedOption}
+                    onInvest={(option) => alert(`Invest in ${option.name}`)}
+                  />
+                </motion.div>
+                {isOptionSelected && (
+                  renderPerformanceChart(
+                    fakeData.find((opt) => opt.id === selectedOption)?.performanceHistory || [],
+                    `Histórico de Desempenho para ${fakeData.find((opt) => opt.id === selectedOption)?.name || ''}`
+                  )
+                )}
+              </React.Fragment>
+            )
+          })}
         </AnimatePresence>
       </div>
-
-      {selectedOption && (
-        <div className="mt-8">
-          {renderPerformanceChart(
-            fakeData.find((opt) => opt.id === selectedOption)
-              ?.performanceHistory || [],
-            `Histórico de Desempenho para ${fakeData.find((opt) => opt.id === selectedOption)?.name || ''
-            }`
-          )}
-        </div>
-      )}
     </div>
   );
 };
