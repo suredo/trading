@@ -8,12 +8,14 @@ export const AuthContext = createContext<{
   signOut: () => Promise<void>;
   isLoading: boolean;
   error: string | null;
+  initialLoadDone: boolean; // Track initial load
 }>({
   user: null,
   signIn: async () => { },
   signOut: async () => { },
   isLoading: false,
   error: null,
+  initialLoadDone: false,
 });
 
 // Create a provider component
@@ -21,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<any>(null); // Start with null, not undefined
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   // Function to sign in
   const signIn = async (email: string, password: string) => {
@@ -78,6 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(session?.user || null);
         }
         setIsLoading(false);
+        setInitialLoadDone(true);
       }
     );
 
@@ -95,7 +99,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     isLoading,
     error,
+    initialLoadDone,
   };
+
+  console.log(user);
 
   return (
     <AuthContext.Provider value={contextValue}>

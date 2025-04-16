@@ -78,13 +78,16 @@ export const InvestmentCard = ({ option, isSelected, onSelect, onInvest }: Inves
             <p className="text-sm text-gray-400">Valor Atual:</p>
             <p className="font-semibold text-gray-200">${option.currentValue.toFixed(2)}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Invest. Mínimo:</p>
-            <p className="font-semibold text-gray-200">${option.minInvestment.toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Invest. Máximo:</p>
-            <p className="font-semibold text-gray-200">${option.maxInvestment.toLocaleString()}</p>
+          <div className="sm:col-span-2">
+            <p className="text-sm text-gray-400">Investimento:</p>
+            <div className="flex gap-4">
+              <div>
+                <p className="font-semibold text-gray-200">Mínimo: ${option.minInvestment.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-200">Máximo: ${option.maxInvestment.toLocaleString()}</p>
+              </div>
+            </div>
           </div>
           <div>
             <p className="text-sm text-gray-400">Retorno:</p>
@@ -96,16 +99,17 @@ export const InvestmentCard = ({ option, isSelected, onSelect, onInvest }: Inves
             >
               {calculatedReturn.toFixed(2)}%
             </p>
+            <div className="mt-2">
+              <div
+                className={cn(
+                  "h-2 rounded-full",
+                  calculatedReturn < 0 ? "bg-red-500" : "bg-green-500"
+                )}
+                style={{ width: `${Math.abs(displayReturn)}%` }}
+              />
+            </div>
           </div>
-          <div className="mt-4 sm:col-span-2">
-            <div
-              className={cn(
-                "h-2 rounded-full",
-                calculatedReturn < 0 ? "bg-red-500" : "bg-green-500"
-              )}
-              style={{ width: `${Math.abs(displayReturn)}%` }} // Use displayReturn here
-            />
-          </div>
+
           <div>
             <p className="text-sm text-gray-400">Vencimento:</p>
             <p className="font-semibold text-gray-200">{option.expirationPeriod}</p>
@@ -146,3 +150,4 @@ export const InvestmentCard = ({ option, isSelected, onSelect, onInvest }: Inves
     </motion.div>
   );
 };
+

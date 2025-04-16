@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from "~/contexts/auth"; // Ajuste o caminho se necessário
+import { useAuth } from "~/contexts/auth";
 import {
   LineChart,
   Line,
@@ -15,12 +15,10 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import { AlertCircle } from "lucide-react"
-import { cn } from '~/utils';
+import { AlertCircle, LogOut } from "lucide-react"
 import fakeData from '~/utils/fakeData';
 import { InvestmentCard } from '~/components/investmentCard';
 
-// Dados fictícios para opções de investimento (substitua por dados reais)
 export interface InvestmentOption {
   id: string;
   name: string;
@@ -36,25 +34,6 @@ export interface InvestmentOption {
   performanceHistory: { date: string; value: number }[];
 }
 
-// Função auxiliar para obter a variante do selo de risco
-const getRiskBadgeVariant = (riskLevel: string) => {
-  switch (riskLevel) {
-    case 'High':
-      return 'bg-red-500 text-white';
-    case 'Medium':
-      return 'bg-yellow-500 text-gray-900';
-    case 'Low':
-      return 'bg-green-500 text-white';
-    default:
-      return 'bg-gray-500 text-white';
-  }
-};
-
-// Função auxiliar para calcular o retorno simples
-const calculateReturn = (currentValue: number, initialInvestment: number) => {
-  return ((currentValue - initialInvestment) / initialInvestment) * 100;
-};
-
 // Variantes de animação
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -68,52 +47,59 @@ const chartVariants = {
   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
 };
 
-const InvestmentProfilePage = () => {
-  const { user, isLoading, error } = useAuth();
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [showFullProfile, setShowFullProfile] = useState(false); // Estado para mostrar o perfil completo
-
-
-  useEffect(() => {
-    if (user) {
-      console.log('User on Investment Profile Page:', user);
-    }
-  }, [user]);
-
-  if (isLoading) {
-    return (
-      <div className="p-4 md:p-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-100">
-          <div className="h-8 w-64 bg-gray-700 rounded animate-pulse"></div>
-        </h1>
-        <div className="space-y-6">
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-gray-700 animate-pulse"></div>
-              <div>
-                <div className="h-6 w-48 mb-2 bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-32 bg-gray-700 rounded animate-pulse"></div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="h-4 w-full mb-2 bg-gray-700 rounded animate-pulse"></div>
-              <div className="h-4 w-3/4 bg-gray-700 rounded animate-pulse"></div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((index) => (
-              <div key={index} className="bg-gray-800 rounded-lg p-6">
-                <div className="h-6 w-48 mb-2 bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-24 bg-gray-700 rounded animate-pulse"></div>
-                <div className="mt-4">
-                  <div className="h-4 w-full mb-2 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="h-4 w-3/4 mb-2 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="h-8 w-full mt-4 bg-gray-700 rounded animate-pulse"></div>
-                </div>
-              </div>
-            ))}
+const LoadingSkeleton = () => {
+  return (
+    <div className="space-y-6">
+      <div className="bg-gray-800 rounded-lg p-6 animate-pulse">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-gray-700"></div>
+          <div>
+            <div className="h-6 w-48 mb-2 bg-gray-700 rounded"></div>
+            <div className="h-4 w-32 bg-gray-700 rounded"></div>
           </div>
         </div>
+        <div className="mt-4">
+          <div className="h-4 w-full mb-2 bg-gray-700 rounded"></div>
+          <div className="h-4 w-3/4 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map((index) => (
+          <div key={index} className="bg-gray-800 rounded-lg p-6 animate-pulse">
+            <div className="h-6 w-48 mb-2 bg-gray-700 rounded"></div>
+            <div className="h-4 w-24 bg-gray-700 rounded"></div>
+            <div className="mt-4">
+              <div className="h-4 w-full mb-2 bg-gray-700 rounded"></div>
+              <div className="h-4 w-3/4 mb-2 bg-gray-700 rounded"></div>
+              <div className="h-8 w-full mt-4 bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const InvestmentProfilePage = () => {
+  const { user, isLoading, error, signOut, initialLoadDone } = useAuth();
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialLoadDone) {
+      if (!user) {
+        window.location.href = '/login';
+      }
+    }
+  }, [initialLoadDone, user]);
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  if (isLoading || !initialLoadDone) {
+    return (
+      <div className="p-4 md:p-8">
+        <LoadingSkeleton />
       </div>
     );
   }
@@ -193,6 +179,13 @@ const InvestmentProfilePage = () => {
     <div className="p-4 md:p-8 bg-gray-900 min-h-screen">
       <div className="flex justify-between items-center mb-6 md:mb-8">
         <h1 className="text-3xl font-bold text-gray-100">Perfil de Investimento</h1>
+        <button
+          onClick={handleLogout}
+          className="text-gray-300 hover:text-gray-100 hover:bg-gray-800 border border-gray-700 flex items-center gap-2 px-4 py-2 rounded-md"
+        >
+          <LogOut className="w-4 h-4" />
+          Sair
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
