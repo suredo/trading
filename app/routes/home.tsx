@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from "~/contexts/auth";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -114,14 +112,6 @@ const InvestmentProfilePage = () => {
             <p>{error}</p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="p-4 md:p-8 text-center text-gray-400">
-        Please log in to view your investment profile.
       </div>
     );
   }
