@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import supabase from '~/supabase';
 
 // Define the structure for the login form data state
