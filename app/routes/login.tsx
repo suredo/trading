@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import supabase from '~/supabase';
 
 // Define the structure for the login form data state
 interface LoginFormData {
@@ -15,7 +17,7 @@ interface LoginFormErrors {
 }
 
 // The main login form component with dark theme
-const LoginFormDark: React.FC = () => {
+const Login: React.FC = () => {
   // State to hold the form data
   const [formData, setFormData] = useState<LoginFormData>({
     identifier: '',
@@ -24,6 +26,8 @@ const LoginFormDark: React.FC = () => {
 
   // State to hold validation errors
   const [errors, setErrors] = useState<LoginFormErrors>({});
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+
 
   // Handle changes in input fields
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,30 +59,38 @@ const LoginFormDark: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission behavior
     const validationErrors = validateForm();
     setErrors(validationErrors);
 
     // Check if there are any validation errors before proceeding
     if (Object.keys(validationErrors).length === 0) {
-      // If basic validation passes, proceed with login logic (e.g., API call)
-      console.log('Tentando fazer login com:', formData);
-      // --- Placeholder for actual login API call ---
-      // Simulating an API call delay and potential error
-      setTimeout(() => {
-        // Example: Check credentials (replace with actual API response)
-        if (formData.identifier === "usuario" && formData.password === "senha123") {
-          console.log('Login bem-sucedido!');
-          alert('Login realizado com sucesso!'); // Replace with proper navigation/state update
-          // Reset form potentially or navigate away
-          // setFormData({ identifier: '', password: '' });
+      setIsLoading(true); // Set loading state
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.identifier, // Use identifier as email
+          password: formData.password,
+        });
+
+        if (error) {
+          console.error('Login error:', error);
+          setErrors({ general: error.message || 'Falha ao fazer login. Verifique suas credenciais.' });
         } else {
-          console.log('Falha no login: Credenciais inválidas');
-          setErrors({ general: 'E-mail/usuário ou senha inválidos.' });
+          console.log('Login bem-sucedido:', data);
+          // Redirect the user to a protected page or update the UI.  Use next/navigation
+          //  For example:
+          //   router.push('/dashboard');  (if using nextjs)
+          alert('Login realizado com sucesso!');
+          setFormData({ identifier: '', password: '' });
+          window.location.href = '/'; // simplest redirect for non-next.js
         }
-      }, 1000); // Simulate network delay
-      // --- End of placeholder ---
+      } catch (error: any) {
+        console.error('Unexpected error:', error);
+        setErrors({ general: 'Ocorreu um erro inesperado: ' + error.message });
+      } finally {
+        setIsLoading(false); // Reset loading state
+      }
     } else {
       console.log('Formulário de login inválido:', validationErrors);
     }
@@ -88,6 +100,7 @@ const LoginFormDark: React.FC = () => {
   const inputStyle = "w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400";
   const errorStyle = "text-red-400 text-sm mt-1"; // Brighter red for dark background
   const labelStyle = "block text-sm font-medium text-gray-300 mb-1"; // Lighter label text
+
 
   return (
     // Main container with dark background
@@ -154,9 +167,10 @@ const LoginFormDark: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out"
+              className="w-full px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Entrar
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </button>
           </div>
 
@@ -174,11 +188,4 @@ const LoginFormDark: React.FC = () => {
 };
 
 // Export the component as the default export
-export default LoginFormDark;
-
-// To use this component in your React application:
-// 1. Make sure you have React and TypeScript set up.
-// 2. Ensure Tailwind CSS is configured in your project.
-// 3. Import this component: `import LoginFormDark from './LoginFormDark';` (adjust path as needed)
-// 4. Render it in your App component or desired location: `<LoginFormDark />`
-// 5. Replace the placeholder links/API call simulation with your actual routing and authentication logic.
+export default Login;
