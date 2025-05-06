@@ -6,5 +6,6 @@ export default [
     route("/login", "routes/login.tsx"),
     route("/wallet", "routes/wallet.tsx"),
     route("/profile", "routes/profile.tsx"),
-    route("/deposit", "routes/deposit.tsx")
+    route("/deposit", "routes/deposit.tsx"),
+    route("/dashboard", "routes/dashboard.tsx")
 ] satisfies RouteConfig;

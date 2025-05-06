@@ -1,29 +1,21 @@
 import type { InvestmentOption } from "~/routes/home";
 
-
-const generateMockPerformanceHistory = (months: number, initialValue: number) => {
-  let value = initialValue;
-  const history = [];
-  const startDate = new Date(new Date().setMonth(new Date().getMonth() - months));
-
-  for (let i = 0; i < months; i++) {
-    const date = new Date(startDate.setMonth(startDate.getMonth() + 1)).toISOString().slice(0, 7);
-    // Simulate some fluctuation
-    const fluctuation = Math.random() * (value * 0.1); // +/- 10%
-    const direction = Math.random() > 0.3 ? 1 : -1; // Favor growth slightly
-    value += fluctuation * direction;
-    history.push({ date, value: Math.max(0, value) }); // Ensure value doesn't go negative
-  }
-  return history;
-};
-
-const generateInvestors = (count: number) => {
+const generateInvestors = (count: number, seed: number) => {
   const investors = [];
-  const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Fiona', 'George', 'Hannah'];
+  const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Fiona', 'George', 'Hannah', 'Isaac', 'Judy', 'Kevin', 'Linda'];
+  // Use a simple seed for randomization
+  const random = (seed: number) => {
+    let x = seed;
+    x = Math.sin(x) * 10000;
+    return x - Math.floor(x);
+  };
+
   for (let i = 0; i < count; i++) {
+    // Create a unique seed for each investor
+    const investorSeed = seed + i;
+    const nameIndex = Math.floor(random(investorSeed) * names.length);
     investors.push({
-      name: names[Math.floor(Math.random() * names.length)] + ' ' + (i + 1),
-      investedAmount: Math.floor(Math.random() * 5000) + 1000, // Between 1000 and 6000
+      name: names[nameIndex] + ' ' + Math.floor(random(investorSeed * 2) * 100), // Add some randomness to the number
     });
   }
   return investors;
@@ -32,75 +24,36 @@ const generateInvestors = (count: number) => {
 const mockInvestmentOptions: InvestmentOption[] = [
   {
     id: 'option-1',
-    name: 'Portfólio de Crescimento Tecnológico',
-    description: 'Invista em empresas de tecnologia de alto crescimento com potencial de valorização significativo.',
-    riskLevel: 'Alto',
-    expectedReturn: '25-35%',
-    currentValue: 18500,
-    initialInvestment: 10000,
+    name: 'Bitcoins',
     minInvestment: 5000,
-    maxInvestment: 500000,
-    expirationPeriod: '5 anos',
-    investors: generateInvestors(25),
-    performanceHistory: generateMockPerformanceHistory(12, 10000),
+    expectedReturn: '25-35%',
+    expirationPeriod: new Date(),
+    investors: generateInvestors(Math.floor(Math.random() * 50) + 20, 100), // Between 20 and 70 investors, seed 100
   },
   {
     id: 'option-2',
-    name: 'Fundo de Índice de Mercado Balanceado',
-    description: 'Portfólio diversificado que acompanha os principais índices de mercado para um crescimento constante.',
-    riskLevel: 'Médio',
+    name: 'Real Estate Fund',
+    minInvestment: 10000,
     expectedReturn: '10-15%',
-    currentValue: 12800,
-    initialInvestment: 10000,
-    minInvestment: 1000,
-    maxInvestment: 1000000,
-    expirationPeriod: '10 anos',
-    investors: generateInvestors(50),
-    performanceHistory: generateMockPerformanceHistory(24, 10000),
+    expirationPeriod: new Date(),
+    investors: generateInvestors(Math.floor(Math.random() * 50) + 20, 200), // Between 20 and 70 investors, seed 200
   },
   {
     id: 'option-3',
-    name: 'Portfólio de Títulos Conservador',
-    description: 'Investimento de baixo risco em títulos públicos e corporativos para renda estável.',
-    riskLevel: 'Baixo',
-    expectedReturn: '4-6%',
-    currentValue: 10900,
-    initialInvestment: 10000,
-    minInvestment: 100,
-    maxInvestment: 2000000,
-    expirationPeriod: '3 anos',
-    investors: generateInvestors(100),
-    performanceHistory: generateMockPerformanceHistory(36, 10000),
+    name: 'Tech Startups Portfolio',
+    minInvestment: 1000,
+    expectedReturn: '30-40%',
+    expirationPeriod: new Date(),
+    investors: generateInvestors(Math.floor(Math.random() * 50) + 20, 300), // Between 20 and 70 investors, seed 300
   },
   {
     id: 'option-4',
-    name: 'Fundo de Mercados Emergentes',
-    description: 'Invista em empresas de economias em desenvolvimento, oferecendo alto potencial de crescimento com risco adicional.',
-    riskLevel: 'Muito Alto',
-    expectedReturn: '30-40%',
-    currentValue: 21000,
-    initialInvestment: 10000,
-    minInvestment: 10000,
-    maxInvestment: 300000,
-    expirationPeriod: '7 anos',
-    investors: generateInvestors(15),
-    performanceHistory: generateMockPerformanceHistory(18, 10000),
-  },
-  {
-    id: 'option-5',
-    name: 'Fundo de Investimento Imobiliário (REIT)',
-    description: 'Invista em um fundo que possui e opera imóveis que geram renda.',
-    riskLevel: 'Médio',
-    expectedReturn: '8-12%',
-    currentValue: 11500,
-    initialInvestment: 5000,
-    maxInvestment: 750000,
-    minInvestment: 5000,
-    expirationPeriod: 'Indeterminado',
-    investors: generateInvestors(60),
-    performanceHistory: generateMockPerformanceHistory(24, 10000),
+    name: 'Government Bonds',
+    minInvestment: 100,
+    expectedReturn: '5-7%',
+    expirationPeriod: new Date(),
+    investors: generateInvestors(Math.floor(Math.random() * 50) + 20, 400), // Between 20 and 70 investors, seed 400
   },
 ];
-
 
 export default mockInvestmentOptions;

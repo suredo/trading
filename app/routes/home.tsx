@@ -1,36 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from "~/contexts/auth";
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  AreaChart,
-  Area,
-} from 'recharts';
 import { AlertCircle, LogOut } from "lucide-react"
-import fakeData from '~/utils/fakeData';
 import { InvestmentCard } from '~/components/investmentCard';
 
+// Import the modified InvestmentOption interface
 export interface InvestmentOption {
-  id: string;
   name: string;
-  description: string;
-  riskLevel: string;
   expectedReturn: string;
-  currentValue: number;
-  initialInvestment: number;
+  expirationPeriod: Date | null;
   minInvestment: number;
-  maxInvestment: number;
-  expirationPeriod: string;
-  investors: Array<{ name: string; investedAmount: number }>;
-  performanceHistory: { date: string; value: number }[];
+  id?: string;
+  investors?: Array<{ name: string }>;
 }
+
+// Mock data, now aligned with the updated InvestmentOption interface
+const fakeData: InvestmentOption[] = [
+  {
+    id: 'option-1',
+    name: 'Bitcoins',
+    expectedReturn: '25-35%',
+    expirationPeriod: new Date(),
+    minInvestment: 5000,
+    investors: [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Charlie' }],
+  },
+  {
+    id: 'option-2',
+    name: 'Real Estate Fund',
+    expectedReturn: '10-15%',
+    expirationPeriod: new Date(),
+    minInvestment: 10000,
+    investors: [{ name: 'David' }, { name: 'Eve' }],
+  },
+  {
+    id: 'option-3',
+    name: 'Tech Startups Portfolio',
+    expectedReturn: '30-40%',
+    expirationPeriod: new Date(),
+    minInvestment: 1000,
+    investors: [{ name: 'Fiona' }, { name: 'George' }, { name: 'Hannah' }, { name: 'test' }],
+  },
+  {
+    id: 'option-4',
+    name: 'Government Bonds',
+    expectedReturn: '5-7%',
+    expirationPeriod: new Date(),
+    minInvestment: 100,
+    investors: [{ name: 'Investor 1' }, { name: 'Investor 2' }],
+  },
+];
+
 
 // Variantes de animação
 const cardVariants = {
@@ -39,11 +58,7 @@ const cardVariants = {
   exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
 };
 
-const chartVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: 'easeInOut' } },
-  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
-};
+
 
 const LoadingSkeleton = () => {
   return (
@@ -77,6 +92,7 @@ const LoadingSkeleton = () => {
     </div>
   );
 };
+
 
 const InvestmentProfilePage = () => {
   const { user, isLoading, error, signOut, initialLoadDone } = useAuth();
@@ -116,54 +132,7 @@ const InvestmentProfilePage = () => {
     );
   }
 
-  const renderPerformanceChart = (performanceHistory: { date: string; value: number }[], title: string) => {
-    return (
-      <motion.div
-        variants={chartVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        className="w-full mt-8" // Added mt-8 here to create space above the chart
-      >
-        <div className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold text-gray-100">{title}</h2>
-          </div>
-          <div className="p-4">
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart
-                data={performanceHistory}
-                margin={{
-                  top: 10,
-                  right: 30,
-                  left: 0,
-                  bottom: 0,
-                }}
-              >
-                <defs>
-                  <linearGradient id={`colorUv${title}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                <XAxis dataKey="date" tick={{ fill: '#9ca3af' }} />
-                <YAxis tick={{ fill: '#9ca3af' }} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#374151', borderColor: '#4b5563', color: '#f8fafc' }}
-                  labelStyle={{ color: '#f8fafc' }}
-                  itemStyle={{ color: '#f8fafc' }}
-                />
-                <Legend wrapperStyle={{ color: '#f8fafc' }} />
-                <Area type="monotone" dataKey="value" stroke="#8884d8" fillOpacity={1} fill={`url(#colorUv${title})`} />
 
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
 
   return (
     <div className="p-4 md:p-8 bg-gray-900 min-h-screen">
@@ -199,12 +168,7 @@ const InvestmentProfilePage = () => {
                     onInvest={(option) => alert(`Invest in ${option.name}`)}
                   />
                 </motion.div>
-                {isOptionSelected && (
-                  renderPerformanceChart(
-                    fakeData.find((opt) => opt.id === selectedOption)?.performanceHistory || [],
-                    `Histórico de Desempenho para ${fakeData.find((opt) => opt.id === selectedOption)?.name || ''}`
-                  )
-                )}
+                {/* Removed chart rendering */}
               </React.Fragment>
             )
           })}

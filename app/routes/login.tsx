@@ -105,7 +105,13 @@ const Login: React.FC = () => {
     // Main container with dark background
     <div className="flex items-center justify-center min-h-screen bg-gray-900 font-sans">
       {/* Form container with dark background */}
-      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-xl">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg">
+        {/* Company Name and Stars */}
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-semibold text-indigo-400">Brasil Investimentos</h1>
+          <div className="text-yellow-500">★★★★★</div>
+        </div>
+
         {/* Form Title */}
         <h2 className="text-2xl font-bold text-center text-gray-100">Entrar</h2>
 
